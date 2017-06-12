@@ -168,6 +168,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       })
 
+      traktorIn.addListener("controlchange", 5, (event) => {
+        eventBus.publish("boilervroom.vu-meter", {
+          type: "volume-level",
+          value: event.value
+        })
+      })
+
       const mixerControlsForCode = [
         "deck1-eq-low",
         "deck1-eq-mid",

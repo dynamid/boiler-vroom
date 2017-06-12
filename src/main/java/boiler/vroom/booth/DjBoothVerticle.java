@@ -16,6 +16,8 @@
 
 package boiler.vroom.booth;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.ITopic;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -64,5 +66,17 @@ public class DjBoothVerticle extends AbstractVerticle {
           startFuture.fail(ar.cause());
         }
       });
+
+    rpiVuMeterSendHack();
+  }
+
+  private void rpiVuMeterSendHack() {
+    vertx.executeBlocking(future -> {
+      ITopic<Object> topic = Hazelcast.newHazelcastInstance().getTopic("vu-meter");
+      vertx.eventBus().consumer("boilervroom.vu-meter", event -> {
+        JsonObject body = (JsonObject) event.body();
+        topic.publish(body.getInteger("value"));
+      });
+    }, res -> {});
   }
 }
